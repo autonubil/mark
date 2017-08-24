@@ -67,12 +67,34 @@ func attrEscape(out *bytes.Buffer, src []byte) {
 	}
 }
 
-func (renderer ConfluenceRenderer) Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
+func (renderer ConfluenceRenderer) AutoLink(out *bytes.Buffer, link []byte, kind int) {
+	logger.Tracef("AutoLink: %s", link)
+
 	options, ok := renderer.Renderer.(*blackfriday.Html)
-	if ok && !strings.Contains(string(link),  "://") && strings.HasSuffix(string(link), ".md") {
-		link = link[:len(link)-3]
-	} 
-	options.Link(out,link,title,content)	
+	if ok {
+		if  !strings.Contains(string(link),  "://") && strings.HasSuffix(string(link), ".md") {
+			link = link[:len(link)-3]
+		} 
+		options.AutoLink(out,link,kind)	
+	}
+	
+}
+
+func (renderer ConfluenceRenderer) Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
+
+	logger.Tracef("link: %s", link)
+
+	options, ok := renderer.Renderer.(*blackfriday.Html)
+	if ok {
+		strLink := string(link)
+		if  !strings.Contains(strLink,  "://") && strings.HasSuffix(strLink, ".md") {
+			strLink =  ( filepath.Base(strLink) )
+			link =  []byte (strLink)
+			link = link[:len(link)-3]
+			logger.Tracef("link: %s", link)
+		} 
+		options.Link(out,link,title,content)	
+	}
 }
 
 
