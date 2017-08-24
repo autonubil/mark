@@ -209,7 +209,7 @@ func formatXML(data []byte) ([]byte, error) {
 }
 
 func main() {
-	args, err := godocs.Parse(usage, "mark 1.0", godocs.UsePager)
+	args, err := godocs.Parse(usage, "mark 1.2", godocs.UsePager)
 	if err != nil {
 		panic(err)
 	}
