@@ -156,6 +156,7 @@ func formatXML(data []byte) ([]byte, error) {
 	decoder.Entity = map[string]string {
 		"ldquo" : "“",
 		"rdquo" : "”",
+		"nbsp" : " ",
 	}
 	
 	encoder := xml.NewEncoder(b)
@@ -468,7 +469,7 @@ func compileMarkdown(markdown []byte, basePath string,  images *map[string]Macro
 			blackfriday.HTML_SMARTYPANTS_LATEX_DASHES,
 		"", "",
 	)
-
+ 
 	renderer := ConfluenceRenderer{
 		htmlRenderer, 
 		basePath,

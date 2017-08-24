@@ -55,7 +55,7 @@ func newMacroImage(path, title, alt string ) (*MacroImage, error) {
 	bounds := img.Bounds()
 
 	// wider than high?
-	if (bounds.Max.Y > bounds.Max.X) {
+	if (bounds.Max.X > bounds.Max.Y) {
 		if bounds.Max.Y > 250 {
 			m.Height = 250
 		} else {
@@ -68,6 +68,8 @@ func newMacroImage(path, title, alt string ) (*MacroImage, error) {
 			m.Height = bounds.Max.Y
 		}
 	}
+
+	fmt.Printf("%#v -> %d", bounds.Max, m.Height)
 	  
 	return m, nil
 }

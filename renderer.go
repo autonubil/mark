@@ -67,7 +67,13 @@ func attrEscape(out *bytes.Buffer, src []byte) {
 	}
 }
 
-
+func (renderer ConfluenceRenderer) Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
+	options, ok := renderer.Renderer.(*blackfriday.Html)
+	if ok && !strings.Contains(string(link),  "://") && strings.HasSuffix(string(link), ".md") {
+		link = link[:len(link)-3]
+	} 
+	options.Link(out,link,title,content)	
+}
 
 
 func (renderer ConfluenceRenderer) Image (
@@ -76,7 +82,7 @@ func (renderer ConfluenceRenderer) Image (
 	title []byte, 
 	alt []byte,
 ) {
-	if (!bytes.Contains(link, []byte(`/`)) ) {
+	if !strings.Contains(string(link), "://") {
 	 	existing_macro, ok := (*renderer.Images)[string(link)]
 		if ok {
 			existing_macro.Render()
@@ -106,20 +112,4 @@ func (renderer ConfluenceRenderer) Image (
 	attrEscape(out, link)
 
 	out.WriteString("\" />")
-}
-
-
-
-func (renderer ConfluenceRenderer) Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
-
-
-	options, _  := renderer.Renderer.(*blackfriday.Html)
-	linkStr := string(link)
-
-	if !strings.Contains(linkStr,"://")  && strings.HasSuffix(linkStr, ".md")  {
-		link = link[:len(link)-3]
-	}
-
-	options.Link(out, link, title, content)
- 
 }
