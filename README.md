@@ -66,3 +66,4 @@ mark -h | --help
 # changes by autonubil
 - only updated changed pages
 - upload local images as attachments
+- simple links (remove ".md" ....)

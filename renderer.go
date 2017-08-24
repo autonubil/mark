@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"strings"
 	"path/filepath"
 	"github.com/russross/blackfriday"
 )
@@ -66,7 +67,13 @@ func attrEscape(out *bytes.Buffer, src []byte) {
 	}
 }
 
-
+func (renderer ConfluenceRenderer) Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
+	options, ok := renderer.Renderer.(*blackfriday.Html)
+	if ok && !strings.Contains(string(link),  "://") && strings.HasSuffix(string(link), ".md") {
+		link = link[:len(link)-3]
+	} 
+	options.Link(out,link,title,content)	
+}
 
 
 func (renderer ConfluenceRenderer) Image (
@@ -75,7 +82,7 @@ func (renderer ConfluenceRenderer) Image (
 	title []byte, 
 	alt []byte,
 ) {
-	if (!bytes.Contains(link, []byte(`/`)) ) {
+	if !strings.Contains(string(link), "://") {
 	 	existing_macro, ok := (*renderer.Images)[string(link)]
 		if ok {
 			existing_macro.Render()
