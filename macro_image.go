@@ -54,10 +54,19 @@ func newMacroImage(path, title, alt string ) (*MacroImage, error) {
   	}
 	bounds := img.Bounds()
 
-	if bounds.Max.Y > 250 {
-		m.Height = 250
+	// wider than high?
+	if (bounds.Max.Y > bounds.Max.X) {
+		if bounds.Max.Y > 250 {
+			m.Height = 250
+		} else {
+			m.Height = bounds.Max.Y
+		}
 	} else {
-		m.Height = bounds.Max.Y
+		if bounds.Max.X > 450 {
+			m.Height = (bounds.Max.Y) / (bounds.Max.X / 450)
+		} else {
+			m.Height = bounds.Max.Y
+		}
 	}
 	  
 	return m, nil

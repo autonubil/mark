@@ -152,8 +152,15 @@ var (
 
 func formatXML(data []byte) ([]byte, error) {
     b := &bytes.Buffer{}
-    decoder := xml.NewDecoder(bytes.NewReader(data))
-    encoder := xml.NewEncoder(b)
+	decoder := xml.NewDecoder(bytes.NewReader(data))
+	decoder.Entity = map[string]string {
+		"ldquo" : "“",
+		"rdquo" : "”",
+	}
+	
+	encoder := xml.NewEncoder(b)
+	 
+
     encoder.Indent("", "  ")
     for {
 		token, err := decoder.Token()
@@ -384,9 +391,15 @@ func main() {
 	}
 
 	 //  any changes?
+	
 	fromattedExisting, err := formatXML([]byte(target.Body.Storage.Value))
-	fromattedNew, err := formatXML(htmlData)
-	if string(fromattedExisting) != string(fromattedNew) {
+	var fromattedNew []byte
+	if (err == nil) {
+		fromattedNew, err = formatXML(htmlData)
+	} else {
+		logger.Fatal(err)
+	}
+	if err != nil || string(fromattedExisting) != string(fromattedNew) {
 		logger.Debug("Updating page")
 		err = api.updatePage(
 			target,
@@ -395,7 +408,11 @@ func main() {
 		if err != nil {
 			logger.Fatal(err)
 		}
-	}  
+	} else {
+		logger.Debug("page has no changes")
+		// logger.Tracef("Stored:\n%s\n-----------\nNew:\n%s", target.Body.Storage.Value, htmlData)
+		//  logger.Tracef("Stored Formatted:\n%s\n-----------\nNew Formatted:\n%s", fromattedExisting, fromattedNew)
+	}
 
 	// Uplodad images
 	for _, imageMacro := range images {
@@ -443,16 +460,17 @@ func compileMarkdown(markdown []byte, basePath string,  images *map[string]Macro
 		[]byte(`<$1`+colon.String()+`$2>`),
 	)
 
-	
+	htmlRenderer  := blackfriday.HtmlRenderer(
+		blackfriday.HTML_USE_XHTML|
+			blackfriday.HTML_USE_SMARTYPANTS|
+			blackfriday.HTML_SMARTYPANTS_FRACTIONS|
+			blackfriday.HTML_SMARTYPANTS_DASHES|
+			blackfriday.HTML_SMARTYPANTS_LATEX_DASHES,
+		"", "",
+	)
+
 	renderer := ConfluenceRenderer{
-		blackfriday.HtmlRenderer(
-			blackfriday.HTML_USE_XHTML|
-				blackfriday.HTML_USE_SMARTYPANTS|
-				blackfriday.HTML_SMARTYPANTS_FRACTIONS|
-				blackfriday.HTML_SMARTYPANTS_DASHES|
-				blackfriday.HTML_SMARTYPANTS_LATEX_DASHES,
-			"", "",
-		), 
+		htmlRenderer, 
 		basePath,
 		images, 
 	}

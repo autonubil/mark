@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"strings"
 	"path/filepath"
 	"github.com/russross/blackfriday"
 )
@@ -89,6 +90,7 @@ func (renderer ConfluenceRenderer) Image (
 			return;
 		}
 	} 
+
 	
 	out.WriteString("<img alt=\"")
 	if len(alt) > 0 {
@@ -105,4 +107,20 @@ func (renderer ConfluenceRenderer) Image (
 	attrEscape(out, link)
 
 	out.WriteString("\" />")
+}
+
+
+
+func (renderer ConfluenceRenderer) Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
+
+
+	options, _  := renderer.Renderer.(*blackfriday.Html)
+	linkStr := string(link)
+
+	if !strings.Contains(linkStr,"://")  && strings.HasSuffix(linkStr, ".md")  {
+		link = link[:len(link)-3]
+	}
+
+	options.Link(out, link, title, content)
+ 
 }
