@@ -2,10 +2,7 @@ package main
 
 import (
 	"bytes"
-<<<<<<< HEAD
 	"strings"
-=======
->>>>>>> b6e3b739e90b23d12deca19d12052b226ecd82a3
 	"path/filepath"
 	"github.com/russross/blackfriday"
 )
@@ -93,10 +90,6 @@ func (renderer ConfluenceRenderer) Image (
 			return;
 		}
 	} 
-<<<<<<< HEAD
-
-=======
->>>>>>> b6e3b739e90b23d12deca19d12052b226ecd82a3
 	
 	out.WriteString("<img alt=\"")
 	if len(alt) > 0 {
@@ -113,7 +106,6 @@ func (renderer ConfluenceRenderer) Image (
 	attrEscape(out, link)
 
 	out.WriteString("\" />")
-<<<<<<< HEAD
 }
 
 
@@ -130,6 +122,4 @@ func (renderer ConfluenceRenderer) Link(out *bytes.Buffer, link []byte, title []
 
 	options.Link(out, link, title, content)
  
-=======
->>>>>>> b6e3b739e90b23d12deca19d12052b226ecd82a3
 }
