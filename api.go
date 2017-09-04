@@ -294,6 +294,8 @@ func (api *API) ensureAttachment(
 	filename := filepath.Base(path)
 	extension := filepath.Ext(path)
  
+	 
+
 	var err error
 	if fileData == nil {
 		fileData, err = ioutil.ReadFile(path)
@@ -313,7 +315,7 @@ func (api *API) ensureAttachment(
 	
 	if (currentAttachment != nil) {
 		if currentAttachment.Data  != nil && bytes.Compare(currentAttachment.Data, fileData) == 0 {
-			logger.Debug("Content of file has not changed ")
+			logger.Debug("Content of file has not changed")
 
 			return nil
 
@@ -342,7 +344,7 @@ func (api *API) ensureAttachment(
 		h.Set("Content-Type", "image/png")
 	} else  if extension == ".jpg" || extension == ".jepg" {
 		h.Set("Content-Type", "image/jepg")
-	} else  {
+	}  else  {
 		h.Set("Content-Type", "image/*")
 	}
 	part, err :=  writer.CreatePart(h)
@@ -447,6 +449,15 @@ func (api *API) downloadImage(
 	 downloadPath string,
 ) ([]byte, error) {
  
+	extension := filepath.Ext(downloadPath)
+	if extension == ".svg" {
+		logger.Debug("Changing PNG to SVG")
+		extension = ".png"
+		downloadPath = downloadPath[0:len(downloadPath)-len(extension)] + ".png"
+	}
+
+	logger.Debug("Fetching attachment from " + downloadPath )
+
 	url := api.download.Api.BaseUrl.String() + downloadPath
 	
 

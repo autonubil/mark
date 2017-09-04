@@ -6,9 +6,10 @@ import (
 	"bytes"
 	"path/filepath"
 	"image"
+	"image/png"
 	_ "image/gif"
-	_ "image/png"
 	_ "image/jpeg"
+	"github.com/rogpeppe/misc/svg"
 )
 
 type MacroImage struct {
@@ -28,7 +29,38 @@ func newMacroImage(path, title, alt string ) (*MacroImage, error) {
 	m := new (MacroImage)
 	m.Path = path
 
-	m.filename = filepath.Base(path)
+	filename := filepath.Base(path)
+	extension := filepath.Ext(path)
+ 
+	if extension == ".svg" {
+		logger.Debug("Convertiong SVG %s to PNG", path)
+		// convert SVG to PNG
+		extension = ".png"
+		filename = filename[0:len(filename)-len(extension)] + ".png"
+
+		file, err := os.Open(path)
+		if (err != nil){
+			return nil, err;
+		}
+		defer file.Close()
+		size := image.Point{1000, 1000}
+		dest, err := svg.Render(file, size)
+		if (err != nil){
+			return nil, err;
+		}
+
+
+		b := new(bytes.Buffer)
+
+		err = png.Encode(b, dest)
+		if err != nil {
+			return nil, err
+		}
+		
+		m.Data =  b.Bytes()
+	}
+
+	m.filename = filename
 	if title == "" {
 		extension := filepath.Ext(path)
 		title = m.filename[0:len(m.filename)-len(extension)]
@@ -37,15 +69,17 @@ func newMacroImage(path, title, alt string ) (*MacroImage, error) {
 	}
 	m.Alt = alt
 
-	reader, err := os.Open(path)
-  	 if err != nil {
-		return nil, err
-  	 }
-  	  
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(reader)
-	m.Data = buf.Bytes()
-	reader.Close()
+	if (m.Data == nil) {
+		reader, err := os.Open(path)
+		if err != nil {
+			return nil, err
+		}
+		
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(reader)
+		m.Data = buf.Bytes()
+		reader.Close()
+	}
 
 	img, _, err := image.Decode(bytes.NewReader(m.Data))
 	  

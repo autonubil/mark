@@ -157,6 +157,7 @@ func formatXML(data []byte) ([]byte, error) {
 		"ldquo" : "“",
 		"rdquo" : "”",
 		"nbsp" : " ",
+		"rsquo" : "'",
 	}
 	
 	encoder := xml.NewEncoder(b)
@@ -398,7 +399,7 @@ func main() {
 	if (err == nil) {
 		fromattedNew, err = formatXML(htmlData)
 	} else {
-		logger.Fatal(err)
+		logger.Warning(err)
 	}
 	if err != nil || string(fromattedExisting) != string(fromattedNew) {
 		logger.Debug("Updating page")
@@ -417,11 +418,12 @@ func main() {
 
 	// Uplodad images
 	for _, imageMacro := range images {
-		
 		existingAttachment, _ := api.getAttachment(target.ID, imageMacro.Path)
 		if existingAttachment == nil  {
+			logger.Tracef("Creating new attachment for %s", imageMacro.Path)
 			api.ensureAttachment(target.ID, imageMacro.Path, imageMacro.Title, imageMacro.Data, nil)
 		} else {
+			logger.Tracef("Updateing attachment for %s", imageMacro.Path)
 			api.ensureAttachment(target.ID, imageMacro.Path, imageMacro.Title, imageMacro.Data, existingAttachment)
 		}
     }

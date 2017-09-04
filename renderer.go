@@ -116,6 +116,8 @@ func (renderer ConfluenceRenderer) Image (
 			(*renderer.Images)[string(link)] = *macro
 			out.WriteString(macro.Render())
 			return;
+		} else {
+			logger.Warningf("Local Image: %s (%s) -> %s was not uploaded (%v) \n", string(title), string(alt), string(link), err)
 		}
 	} 
 	
